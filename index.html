@@ -22,28 +22,18 @@ dt{font-weight:bold;margin-top:12px}
 
 <script>
 (function(){
-  /* ---------- ハッシュ取得 ---------- */
-  let h = location.hash.slice(1);
-  if(!h){
-    document.getElementById('content').textContent='データが見つかりません。';
-    return;
-  }
-  /* ---------- Base64URL → JSON ---------- */
-  h = h.replace(/-/g,'+').replace(/_/g,'/');
-  h += '='.repeat((4 - h.length % 4) % 4);
+  let h=location.hash.slice(1);
+  if(!h){document.getElementById('content').textContent='データが見つかりません。';return;}
+  h=h.replace(/-/g,'+').replace(/_/g,'/');h+='='.repeat((4-h.length%4)%4);
   try{
-    // atob → Uint8Array → UTF-8
-    const bin   = atob(h);
-    const bytes = Uint8Array.from(bin, c=>c.charCodeAt(0));
-    const json  = new TextDecoder('utf-8').decode(bytes);
-    const data  = JSON.parse(json);
-
-    const cont  = document.getElementById('content');
-    cont.innerHTML='';
-    for(const [k,v] of Object.entries(data)){
-      const dt=document.createElement('dt'); dt.textContent=k;
-      const dd=document.createElement('dd'); dd.textContent=v;
-      cont.appendChild(dt); cont.appendChild(dd);
+    const bin=atob(h);
+    const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));
+    const data=JSON.parse(new TextDecoder('utf-8').decode(bytes));
+    const cont=document.getElementById('content');cont.innerHTML='';
+    for(const[k,v]of Object.entries(data)){
+      const dt=document.createElement('dt');dt.textContent=k;
+      const dd=document.createElement('dd');dd.textContent=v;
+      cont.appendChild(dt);cont.appendChild(dd);
     }
   }catch(e){
     document.getElementById('content').textContent='データを解読できませんでした。';
