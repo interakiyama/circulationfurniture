@@ -5,11 +5,15 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Circulation Furniture</title>
 <style>
-body{margin:0;padding:20px;font-family:-apple-system,BlinkMacSystemFont,
- BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;font-size:16px;
- line-height:1.6;background:#fff;white-space:pre-wrap;}
+body{
+  margin:0;padding:20px;
+  font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;
+  background:#fff;font-size:16px;line-height:1.6;
+  white-space:pre-wrap;text-align:left;
+}
 h1{font-size:20px;margin:0 0 12px}
-dt{font-weight:bold;margin-top:8px}
+dt,dd{margin:0;padding:0;text-align:left;}
+dt{font-weight:bold;margin-top:12px}
 </style>
 </head>
 <body>
@@ -19,27 +23,22 @@ dt{font-weight:bold;margin-top:8px}
 <script>
 (function(){
   /* ---------- ハッシュ取得 ---------- */
-  let hash = location.hash.slice(1);
-  if(!hash){
+  let h = location.hash.slice(1);
+  if(!h){
     document.getElementById('content').textContent='データが見つかりません。';
     return;
   }
-
   /* ---------- Base64URL → JSON ---------- */
-  // URLセーフ -> 標準Base64 に戻す
-  hash = hash.replace(/-/g,'+').replace(/_/g,'/');
-  // パディング補完
-  hash += '='.repeat((4 - hash.length % 4) % 4);
-
+  h = h.replace(/-/g,'+').replace(/_/g,'/');
+  h += '='.repeat((4 - h.length % 4) % 4);
   try{
-    // atob → Uint8Array → UTF-8 文字列
-    const binary = atob(hash);
-    const bytes  = Uint8Array.from(binary, c => c.charCodeAt(0));
-    const jsonStr = new TextDecoder('utf-8').decode(bytes);
-    const data = JSON.parse(jsonStr);
+    // atob → Uint8Array → UTF-8
+    const bin   = atob(h);
+    const bytes = Uint8Array.from(bin, c=>c.charCodeAt(0));
+    const json  = new TextDecoder('utf-8').decode(bytes);
+    const data  = JSON.parse(json);
 
-    /* ---------- 画面に表示 ---------- */
-    const cont=document.getElementById('content');
+    const cont  = document.getElementById('content');
     cont.innerHTML='';
     for(const [k,v] of Object.entries(data)){
       const dt=document.createElement('dt'); dt.textContent=k;
