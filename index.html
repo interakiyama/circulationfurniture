@@ -2,11 +2,12 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>Circulation Furniture</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Circulation Furniture</title>
 <style>
-body{margin:0;padding:20px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;
-     background:#fff;font-size:16px;line-height:1.6;white-space:pre-wrap;}
+body{margin:0;padding:20px;font-family:-apple-system,BlinkMacSystemFont,
+ BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;font-size:16px;
+ line-height:1.6;background:#fff;white-space:pre-wrap;}
 h1{font-size:20px;margin:0 0 12px}
 dt{font-weight:bold;margin-top:8px}
 </style>
@@ -17,25 +18,33 @@ dt{font-weight:bold;margin-top:8px}
 
 <script>
 (function(){
-  // ハッシュ取得（前の # を除く）
-  const hash = location.hash.slice(1);
+  /* ---------- ハッシュ取得 ---------- */
+  let hash = location.hash.slice(1);
   if(!hash){
     document.getElementById('content').textContent='データが見つかりません。';
     return;
   }
-  // Padding を補完して base64 デコード
-  const padded = hash + "===".slice((hash.length+3)%4);
-  try{
-    const json = atob(padded.replace(/-/g,'+').replace(/_/g,'/'));
-    const data = JSON.parse(json);
 
-    // 画面に整形表示
-    const content = document.getElementById('content');
-    content.innerHTML='';
-    for(const [key,val] of Object.entries(data)){
-      const dt=document.createElement('dt'); dt.textContent=key;
-      const dd=document.createElement('dd'); dd.textContent=val;
-      content.appendChild(dt); content.appendChild(dd);
+  /* ---------- Base64URL → JSON ---------- */
+  // URLセーフ -> 標準Base64 に戻す
+  hash = hash.replace(/-/g,'+').replace(/_/g,'/');
+  // パディング補完
+  hash += '='.repeat((4 - hash.length % 4) % 4);
+
+  try{
+    // atob → Uint8Array → UTF-8 文字列
+    const binary = atob(hash);
+    const bytes  = Uint8Array.from(binary, c => c.charCodeAt(0));
+    const jsonStr = new TextDecoder('utf-8').decode(bytes);
+    const data = JSON.parse(jsonStr);
+
+    /* ---------- 画面に表示 ---------- */
+    const cont=document.getElementById('content');
+    cont.innerHTML='';
+    for(const [k,v] of Object.entries(data)){
+      const dt=document.createElement('dt'); dt.textContent=k;
+      const dd=document.createElement('dd'); dd.textContent=v;
+      cont.appendChild(dt); cont.appendChild(dd);
     }
   }catch(e){
     document.getElementById('content').textContent='データを解読できませんでした。';
